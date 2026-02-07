@@ -37,42 +37,34 @@ def log_request_end(response):
     )
     return response
 
-
-@api.route('/tasks', methods=['GET'])
-def list_tasks():
-    """List all tasks, optionally filtered by status."""
-    logger = get_logger()
-    status = request.args.get('status')
-    
-    if status:
-        if status not in Task.VALID_STATUSES:
-            logger.warning(f"Invalid status filter requested: {status}")
-            return jsonify({
-                'error': f'Invalid status. Must be one of: {", ".join(Task.VALID_STATUSES)}'
-            }), 400
-        tasks = Task.query.filter_by(status=status).all()
-    else:
-        tasks = Task.query.all()
-    
-    logger.debug(f"Listed {len(tasks)} tasks" + (f" with status={status}" if status else ""))
-    return jsonify({
-        'tasks': [task.to_dict() for task in tasks],
-        'count': len(tasks)
-    })
-
-
+@api.route('/tasks', defaults={'task_id': None}, methods=['GET'])
 @api.route('/tasks/<int:task_id>', methods=['GET'])
-def get_task(task_id):
-    """Get a single task by ID."""
-    logger = get_logger()
-    task = Task.query.get(task_id)
-    
-    if not task:
-        logger.warning(f"Task not found: ID {task_id}")
-        return jsonify({'error': f'Task with ID {task_id} not found'}), 404
-    
-    logger.debug(f"Retrieved task: ID {task_id}")
-    return jsonify(task.to_dict())
+def get_taskss(task_id = None):
+    try:
+        logger = get_logger()
+        task_status = request.args.get('status')
+        if task_status and task_status not in Task.VALID_STATUSES:
+            return jsonify({'error': f'Invalid status. Must be one of: {", ".join(Task.VALID_STATUSES)}'}), 400
+        
+        if task_id:
+            query_tasks = Task.query.get(task_id)
+            logger.debug(f"Retrieved task with ID={task_id}")
+            return jsonify(query_tasks.to_dict())
+        
+        if task_status:
+            query_tasks = Task.query.filter_by(status=task_status).all()
+            logger.debug(f"Retrieved tasks with status={task_status}")
+        else:
+            query_tasks = Task.query.all()
+            logger.debug(f"Retrieved all tasks")
+        return jsonify({
+            'tasks': [task.to_dict() for task in query_tasks],
+            'count': len(query_tasks)
+        })
+    except Exception as err:
+        logger = get_logger()
+        logger.error(f"Error retrieving tasks: {err}")
+        return jsonify({'error': 'An error occurred while retrieving tasks'}), 500
 
 
 @api.route('/tasks', methods=['POST'])

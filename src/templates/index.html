@@ -10,5 +10,28 @@
     <h1>
         Its task tracker!
     </h1>
+    <p>I will add a form to add/update/delete tasks.</p>
+    <button onclick="get_tasks()">Get all tasks</button>
+    <pre id="tasks"></pre>
+    <input type="number" id="taskId" placeholder="Task ID">
+    <button onclick="get_task_by_id()">Get task</button>
+    <pre id="task"></pre>
+    <script>
+        async function get_tasks() {
+            try {
+                const response = await fetch('/api/tasks');
+    
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+    
+                const data = await response.json();
+                document.getElementById("tasks").textContent =
+                    JSON.stringify(data, null, 2);
+            } catch (error) {
+                console.error('Error fetching tasks:', error);
+            }
+        }
+    </script>
 </body>
 </html>
