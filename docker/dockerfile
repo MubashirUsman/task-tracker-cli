@@ -1,0 +1,28 @@
+FROM python:3.11-alpine as build-stage
+
+WORKDIR /app
+COPY ./requirements.txt /app
+RUN pip install --no-cache-dir -r requirements.txt
+
+FROM python:3.11-alpine as runtime-stage
+
+WORKDIR /app
+
+ARG user=appuser
+ARG group=appgroup
+ARG uid=6000
+ARG gid=6000
+RUN addgroup --gid ${gid} ${group} && \
+    adduser --uid ${uid} --ingroup ${group} --home /app --system ${user}
+
+COPY --from=build-stage /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=build-stage /usr/local/bin /usr/local/bin
+COPY src/ ./src
+
+RUN chown -R ${user}:${group} /app
+
+USER ${user}
+
+EXPOSE 8000
+
+ENTRYPOINT ["python3", "src/app.py"]
