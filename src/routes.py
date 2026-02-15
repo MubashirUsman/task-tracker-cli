@@ -39,6 +39,8 @@ def log_request_end(response):
 
 @api.route('/tasks', defaults={'task_id': None}, methods=['GET'])
 @api.route('/tasks/<int:task_id>', methods=['GET'])
+# @metrics.histogram('requests_by_status', 'Request latencies by status code',
+#                    labels={'status': lambda r: r.status_code})
 def get_taskss(task_id = None):
     try:
         logger = get_logger()

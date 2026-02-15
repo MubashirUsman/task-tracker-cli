@@ -3,12 +3,15 @@ from config import Config
 from models import db
 from routes import api
 from logging_config import setup_logging
+from prometheus_flask_exporter import PrometheusMetrics
 
 app = Flask(__name__)
 app.config.from_object(Config)
 
 # Setup logging
 logger = setup_logging(app)
+
+metrics = PrometheusMetrics(app)
 
 # Initialize SQLAlchemy
 db.init_app(app)
