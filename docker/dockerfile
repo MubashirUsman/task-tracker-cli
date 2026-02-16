@@ -1,23 +1,23 @@
-FROM python:3.11-alpine as build-stage
+FROM python:3.12-slim-trixie AS build-stage
 
 WORKDIR /app
 COPY ./requirements.txt /app
 RUN pip install --no-cache-dir -r requirements.txt
 
-FROM python:3.11-alpine as runtime-stage
-
-WORKDIR /app
+FROM python:3.12-slim-trixie AS runtime-stage
 
 ARG user=appuser
 ARG group=appgroup
 ARG uid=6000
 ARG gid=6000
-RUN addgroup --gid ${gid} ${group} && \
-    adduser --uid ${uid} --ingroup ${group} --home /app --system ${user}
 
-COPY --from=build-stage /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+RUN addgroup --gid ${gid} ${group} && adduser --uid ${uid} --ingroup ${group} ${user} --shell /sbin/nologin --disabled-password
+
+WORKDIR /app
+
+COPY --from=build-stage /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=build-stage /usr/local/bin /usr/local/bin
-COPY src/ ./src
+COPY src/ /app/src
 
 RUN chown -R ${user}:${group} /app
 

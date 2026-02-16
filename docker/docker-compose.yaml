@@ -1,8 +1,0 @@
-services:
-  task-tracker:
-    build:
-      context: ../
-      dockerfile: ./dockerfile
-    tag: task-tracker:1.0.0
-    ports:
-      - "8000:8000"
