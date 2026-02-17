@@ -25,4 +25,4 @@ USER ${user}
 
 EXPOSE 8000
 
-ENTRYPOINT ["python3", "src/app.py"]
+ENTRYPOINT ["gunicorn", "app:app"]
