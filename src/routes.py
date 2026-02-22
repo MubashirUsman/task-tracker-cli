@@ -105,7 +105,9 @@ def create_task():
             'error': f'Invalid status. Must be one of: {", ".join(Task.VALID_STATUSES)}'
         }), 400
 
-    task = Task(name=name, status=status, user_id=session['user_id'])
+    description = data.get('description', '').strip() or None
+
+    task = Task(name=name, description=description, status=status, user_id=session['user_id'])
     db.session.add(task)
     db.session.commit()
 
@@ -149,6 +151,11 @@ def update_task(task_id):
             }), 400
         task.status = data['status']
         changes.append(f"status='{data['status']}'")
+
+    if 'description' in data:
+       if data['description'].strip():
+          task.description = data['description']
+          changes.append(f"description='{data['description']}'")
 
     task.updated_at = datetime.utcnow()
     db.session.commit()

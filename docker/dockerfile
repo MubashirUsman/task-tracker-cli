@@ -13,16 +13,15 @@ ARG gid=6000
 
 RUN addgroup --gid ${gid} ${group} && adduser --uid ${uid} --ingroup ${group} ${user} --shell /sbin/nologin --disabled-password
 
-WORKDIR /app
-
 COPY --from=build-stage /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=build-stage /usr/local/bin /usr/local/bin
 COPY src/ /app/src
-
-RUN chown -R ${user}:${group} /app
+RUN mkdir -p /app/data && chown -R ${user}:${group} /app
 
 USER ${user}
 
 EXPOSE 8000
 
-ENTRYPOINT ["gunicorn", "app:app"]
+WORKDIR /app/src
+
+ENTRYPOINT ["gunicorn", "app:app", "--bind", "0.0.0.0:8000", "--workers", "2", "--preload"]
