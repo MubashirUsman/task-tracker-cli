@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Task Tracker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f0f23;
+      --bg-secondary: #1a1a2e;
+      --bg-card: #16213e;
+      --accent-primary: #7c3aed;
+      --accent-secondary: #a855f7;
+      --accent-gradient: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #c084fc 100%);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --border-color: rgba(124, 58, 237, 0.2);
+      --danger: #ef4444;
+      --success: #10b981;
+      --glass-bg: rgba(22, 33, 62, 0.6);
+      --shadow-glow: 0 0 40px rgba(124, 58, 237, 0.15);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .bg-pattern {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background:
+        radial-gradient(ellipse at 20% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 80%, rgba(168, 85, 247, 0.08) 0%, transparent 50%);
+      pointer-events: none; z-index: 0;
+    }
+
+    .auth-container {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 420px; padding: 1.5rem;
+    }
+
+    .auth-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-color);
+      border-radius: 20px;
+      padding: 2.5rem;
+      box-shadow: var(--shadow-glow);
+    }
+
+    .logo { text-align: center; margin-bottom: 2rem; }
+
+    .logo-icon {
+      width: 56px; height: 56px; margin: 0 auto 1rem;
+      background: var(--accent-gradient);
+      border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.75rem;
+      box-shadow: 0 8px 32px rgba(124, 58, 237, 0.3);
+    }
+
+    .logo h1 {
+      font-size: 1.75rem; font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo p { color: var(--text-secondary); font-size: 0.9rem; margin-top: 0.25rem; }
+
+    .flash-message {
+      padding: 0.75rem 1rem; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 500; margin-bottom: 1.25rem;
+    }
+    .flash-message.error {
+      background: rgba(239, 68, 68, 0.15); color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .flash-message.success {
+      background: rgba(16, 185, 129, 0.15); color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .form-group { margin-bottom: 1.25rem; }
+
+    label {
+      display: block; font-size: 0.85rem; font-weight: 500;
+      color: var(--text-secondary); margin-bottom: 0.5rem;
+    }
+
+    input {
+      width: 100%; padding: 0.875rem 1rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-size: 0.95rem; font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
+    }
+
+    input::placeholder { color: var(--text-muted); }
+
+    .btn-primary {
+      width: 100%; padding: 0.875rem;
+      background: var(--accent-gradient);
+      color: white; border: none; border-radius: 10px;
+      font-size: 1rem; font-weight: 600; font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(124, 58, 237, 0.3);
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(124, 58, 237, 0.4);
+    }
+
+    .auth-footer {
+      text-align: center; margin-top: 1.5rem;
+      color: var(--text-secondary); font-size: 0.9rem;
+    }
+
+    .auth-footer a {
+      color: var(--accent-secondary); text-decoration: none; font-weight: 500;
+    }
+
+    .auth-footer a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="bg-pattern"></div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="logo">
+        <div class="logo-icon">&#10003;</div>
+        <h1>Task Tracker</h1>
+        <p>Sign in to your account</p>
+      </div>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="flash-message {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+
+      <form action="/login" method="post">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+      </form>
+
+      <p class="auth-footer">Don't have an account? <a href="/register">Create one</a></p>
+    </div>
+  </div>
+</body>
+</html>

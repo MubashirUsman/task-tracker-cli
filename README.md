@@ -9,3 +9,10 @@
 - python3 task_tracker add call-mama
 - python3 task_tracker *ID* mark-done
 - python3 task_tracker delete *ID*
+
+## Roadmap
+- use postgres
+- implement circuit breaker while connecting to db
+- implement graceful degradation, read-only should work even if db is not working
+- add authentication
+- user can add/delete/update/get tasks

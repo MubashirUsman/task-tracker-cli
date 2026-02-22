@@ -528,6 +528,43 @@
       color: var(--text-primary);
     }
 
+    /* User bar */
+    .user-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .user-greeting {
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .user-greeting strong {
+      color: var(--accent-secondary);
+    }
+
+    .btn-logout {
+      padding: 0.5rem 1.25rem;
+      background: rgba(239, 68, 68, 0.12);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.25);
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-logout:hover {
+      background: rgba(239, 68, 68, 0.25);
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
       .container {
@@ -562,6 +599,10 @@
   <div class="bg-pattern"></div>
 
   <div class="container">
+    <div class="user-bar">
+      <span class="user-greeting">Signed in as <strong>{{ username }}</strong></span>
+      <a href="/logout" class="btn-logout">Sign Out</a>
+    </div>
     <header>
       <div class="logo">
         <div class="logo-icon">✓</div>
@@ -774,6 +815,14 @@
       return div.innerHTML;
     }
 
+    function handleAuthError(res) {
+      if (res.status === 401) {
+        window.location.href = '/login';
+        return true;
+      }
+      return false;
+    }
+
     // Fetch all tasks
     async function fetchTasks() {
       try {
@@ -781,10 +830,10 @@
         const url = status ? `${API}?status=${status}` : API;
 
         const res = await fetch(url);
+        if (handleAuthError(res)) return;
         if (!res.ok) throw new Error('Failed to fetch tasks');
 
         const data = await res.json();
-        // API returns {tasks: [...], count: N}
         const tasks = data.tasks || [];
         renderTasks(tasks);
       } catch (error) {
